@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>AnimeUZ CORE</title>
+
+<style>
+/* ================== RESET ================== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
+body{background:#0f172a;color:#e5e7eb}
+
+/* ================== NAV ================== */
+.nav{
+ background:#020617;
+ padding:14px 30px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ position:sticky;top:0;z-index:99
+}
+.logo{color:#f59e0b;font-size:26px;font-weight:900}
+.nav input,.nav select{
+ padding:8px 14px;
+ border-radius:20px;
+ border:none;
+ outline:none
+}
+.nav button{
+ background:#f59e0b;
+ border:none;
+ padding:8px 16px;
+ border-radius:10px;
+ font-weight:800;
+ cursor:pointer
+}
+
+/* ================== STATS ================== */
+.stats{display:flex;gap:16px;padding:20px}
+.stat{
+ background:#020617;
+ padding:14px 20px;
+ border-radius:16px;
+ text-align:center;
+ animation:fade .4s
+}
+.stat b{font-size:22px;color:#f59e0b}
+
+/* ================== GRID ================== */
+.grid{
+ padding:25px;
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+ gap:24px;
+ animation:fade .4s
+}
+
+/* ================== CARD ================== */
+.card{
+ background:#000;
+ border-radius:20px;
+ overflow:hidden;
+ position:relative;
+ cursor:pointer;
+ transition:.35s
+}
+.card:hover{
+ transform:translateY(-14px) scale(1.05);
+ box-shadow:0 40px 70px rgba(0,0,0,.8)
+}
+.card img{
+ width:100%;
+ height:300px;
+ object-fit:cover
+}
+.overlay{
+ position:absolute;inset:0;
+ background:linear-gradient(to top,rgba(0,0,0,.95),transparent)
+}
+.title{
+ position:absolute;
+ bottom:60px;
+ left:14px;
+ right:14px;
+ font-weight:900
+}
+.meta{
+ position:absolute;
+ bottom:14px;
+ left:14px;
+ right:14px;
+ display:flex;
+ justify-content:space-between;
+ font-size:12px
+}
+.badge{
+ background:#0ea5e9;
+ padding:3px 8px;
+ border-radius:6px
+}
+.views{
+ background:#22c55e;
+ padding:3px 8px;
+ border-radius:6px
+}
+
+/* ================== PAGE ================== */
+.page{padding:25px;animation:fade .3s}
+.back{color:#f59e0b;font-weight:900;cursor:pointer;margin-bottom:12px}
+
+/* ================== EPISODES ================== */
+.episodes button{
+ margin:6px;padding:8px 16px;
+ border-radius:10px;
+ border:1px solid #f59e0b;
+ background:#020617;
+ color:#fff;
+ cursor:pointer
+}
+.episodes button:hover{background:#f59e0b;color:#000}
+
+/* ================== PLAYER ================== */
+.player{
+ width:100%;height:420px;
+ border-radius:20px;
+ overflow:hidden;
+ background:#000
+}
+iframe{width:100%;height:100%;border:none}
+
+/* ================== ADMIN ================== */
+.admin{
+ max-width:520px;
+ margin:auto;
+ background:#020617;
+ padding:22px;
+ border-radius:20px
+}
+.admin h2{text-align:center}
+.admin input,.admin select{
+ width:100%;padding:10px;
+ margin:6px 0;border-radius:10px;border:none
+}
+.admin button{
+ width:100%;padding:12px;
+ background:#f59e0b;border:none;
+ border-radius:10px;font-weight:900
+}
+.del{background:#ef4444 !important}
+
+/* ================== LOADER ================== */
+.loader{
+ width:60px;height:60px;
+ border:6px solid #1e293b;
+ border-top:6px solid #f59e0b;
+ border-radius:50%;
+ animation:spin 1s linear infinite;
+ margin:80px auto
+}
+
+/* ================== ANIM ================== */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fade{from{opacity:0;transform:translateY(15px)}to{opacity:1}}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+ <div class="logo">AnimeUZ</div>
+ <input placeholder="Qidirish..." oninput="searchAnime(this.value)">
+ <select onchange="filterGenre(this.value)">
+  <option value="">Barcha janrlar</option>
+  <option>Fantasy</option>
+  <option>Action</option>
+  <option>Romance</option>
+ </select>
+ <button onclick="adminLogin()">Admin</button>
+</div>
+
+<div id="stats"></div>
+<div id="app"></div>
+
+<script>
+/* ================== CONFIG ================== */
+const ADMIN_LOGIN="admin",ADMIN_PASS="12345";
+
+/* ================== STATE ================== */
+let page="home",current=null,ep=null,isAdmin=false,genre="";
+
+/* ================== DATA ================== */
+let animes=JSON.parse(localStorage.getItem("animes"))||[
+ {
+  id:1,
+  title:"Men bir kun malika bo‘ldim",
+  img:"https://i.imgur.com/9Xg7QwL.jpg",
+  genre:"Fantasy",
+  paid:true,
+  views:1200,
+  episodes:[{n:1,v:"https://www.youtube.com/embed/dQw4w9WgXcQ"}]
+ }
+];
+
+/* ================== SAVE ================== */
+const save=()=>localStorage.setItem("animes",JSON.stringify(animes));
+
+/* ================== AUTH ================== */
+function adminLogin(){
+ let l=prompt("Login"),p=prompt("Parol");
+ if(l===ADMIN_LOGIN&&p===ADMIN_PASS){
+  isAdmin=true;page="admin";draw()
+ }else alert("Xato")
+}
+
+/* ================== SEARCH ================== */
+function searchAnime(q){
+ q=q.toLowerCase();
+ document.querySelectorAll(".card").forEach(c=>{
+  c.style.display=c.dataset.t.includes(q)?"block":"none"
+ })
+}
+const filterGenre=g=>{genre=g;draw()}
+
+/* ================== OPEN ================== */
+const openAnime=id=>{
+ current=animes.find(a=>a.id===id);
+ current.views++;save();
+ page="anime";draw()
+}
+const openEp=n=>{
+ if(current.paid&&!isAdmin)return alert("Pullik");
+ ep=n;page="watch";draw()
+}
+const back=()=>{page="home";draw()}
+
+/* ================== STATS ================== */
+function drawStats(){
+ let eps=animes.reduce((s,a)=>s+a.episodes.length,0);
+ stats.innerHTML=`
+ <div class="stats">
+  <div class="stat"><b>${animes.length}</b><br>Anime</div>
+  <div class="stat"><b>${eps}</b><br>Qism</div>
+  <div class="stat"><b>${animes.reduce((s,a)=>s+a.views,0)}</b><br>Ko‘rish</div>
+ </div>`;
+}
+
+/* ================== DRAW ================== */
+function draw(){
+ app.innerHTML="";drawStats();
+
+ if(page==="home"){
+  app.innerHTML=`<div class="grid">${
+   animes.filter(a=>!genre||a.genre===genre).map(a=>`
+   <div class="card" data-t="${a.title.toLowerCase()}" onclick="openAnime(${a.id})">
+    <img src="${a.img}">
+    <div class="overlay"></div>
+    <div class="title">${a.title}</div>
+    <div class="meta">
+     <span>${a.genre}</span>
+     <span class="views">👁 ${a.views}</span>
+    </div>
+   </div>`).join("")
+  }</div>`;
+ }
+
+ if(page==="anime"){
+  app.innerHTML=`
+  <div class="page">
+   <div class="back" onclick="back()">← Orqaga</div>
+   <h2>${current.title}</h2>
+   <div class="episodes">
+    ${current.episodes.map(e=>`<button onclick="openEp(${e.n})">Qism ${e.n}</button>`).join("")}
+   </div>
+  </div>`;
+ }
+
+ if(page==="watch"){
+  let e=current.episodes.find(x=>x.n===ep);
+  app.innerHTML=`
+  <div class="page">
+   <div class="back" onclick="openAnime(${current.id})">← Qismlar</div>
+   <div class="player"><iframe src="${e.v}" allowfullscreen></iframe></div>
+  </div>`;
+ }
+
+ if(page==="admin"){
+  app.innerHTML=`
+  <div class="page">
+   <div class="admin">
+    <h2>Admin Panel</h2>
+    <input id="t" placeholder="Anime nomi">
+    <input id="i" placeholder="Rasm URL">
+    <input id="g" placeholder="Janr">
+    <button onclick="animes.push({id:Date.now(),title:t.value,img:i.value,genre:g.value,paid:false,views:0,episodes:[]});save();draw()">Anime qo‘shish</button>
+   </div>
+  </div>`;
+ }
+}
+draw();
+</script>
+
+</body>
+</html>
