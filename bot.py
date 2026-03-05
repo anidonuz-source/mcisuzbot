@@ -287,17 +287,16 @@ async def show_more(call: types.CallbackQuery):
 # ============================================
 
 @dp.message(F.text)
-async def handle_ip(message: types.Message):
+async def handle_commands_and_domains(message: types.Message):
     text = message.text.strip()
 
+    # Agar komandalar bo'lsa, ularni boshqa /s, /p, /v handlerlari qamrab oladi
     if text.startswith("/"):
-        return
+        return  # komandalarni hozirgi alohida handlerlar ishlaydi
 
-    if "." not in text or " " in text:
-        return  # Oddiy gap → javob bermaydi
-
-    await send_server_status(message, text, "s")
-
+    # Faqat domen/IP formatida bo'lsa javob ber
+    if "." in text and " " not in text:
+        await send_server_status(message, text, "s")
 # ============================================
 # START BOT
 # ============================================
@@ -308,3 +307,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
