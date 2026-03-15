@@ -405,7 +405,7 @@ async def fetch_server_info(ip: str):
         except:
             return None
 
-async def send_server_status(message: types.Message, ip: str, mode: str):
+async def send_server_status(message: types.Message, ip: str):
     if "." not in ip:
         await message.reply("❌ Faqat domen qabul qilinadi!")
         return
