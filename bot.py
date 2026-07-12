@@ -1850,9 +1850,28 @@ async def handle_text(message: types.Message, state: FSMContext):
         lang = get_user_lang(uid)
         await message.reply(t(lang, "server_invalid"), parse_mode="HTML")
 
+# ================= RENDER UCHUN MINIMAL WEB SERVER =================
+# Render "Web Service" turi portni tinglab turishni talab qiladi.
+# Bu funksiya faqat shu talabni qondirish uchun - botning asosiy ishiga (polling) tegmaydi.
+from aiohttp import web as _aioweb
+
+async def _handle_ping(request):
+    return _aioweb.Response(text="Minecraft Stats Bot ishlab turibdi ✅")
+
+async def start_keepalive_server():
+    app = _aioweb.Application()
+    app.router.add_get("/", _handle_ping)
+    runner = _aioweb.AppRunner(app)
+    await runner.setup()
+    port = int(os.getenv("PORT", 10000))
+    site = _aioweb.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"✅ Keep-alive server {port}-portda ishga tushdi")
+
 # ================= RUN =================
 async def main():
     print("✅ Minecraft Stats Bot v2.0 ishga tushdi!")
+    await start_keepalive_server()
     await dp.start_polling(bot, drop_pending_updates=True)
 
 if __name__ == "__main__":
