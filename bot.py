@@ -213,6 +213,24 @@ TEXTS = {
         "admin_removed": "✅ {uid} — Admin o'chirildi",
         "cancelled": "❌ Bekor qilindi",
         "new_member_group": "👋 Salom! Men <b>Minecraft Server Monitor</b> botiman!\n\n🖥 Menga server manzilini yuboring, men uning statistikasini ko'rsataman!\n\n💎 To'liq ma'lumot uchun: @{bot}",
+        "btn_admin_panel": "⚙️ Admin Panel",
+        "btn_top": "🏆 Top Serverlar",
+        "btn_about": "ℹ️ Bot haqida",
+        "btn_help": "❓ Yordam",
+        "btn_lang": "🌐 Til",
+        "btn_premium_get": "💎 Premium olish",
+        "btn_premium_active": "💎 Premium ✅",
+        "btn_stats": "📊 Statistika",
+        "btn_add_group": "🤝 Guruhga qo'shish",
+        "btn_subscribe": "💎 Obuna sotib olish →",
+        "pf_players": "👥 O'yinchilar ro'yxati",
+        "pf_plugins": "🧩 Pluginlar ro'yxati",
+        "pf_hosting": "💻 Hosting ma'lumoti",
+        "pf_ipport": "🔌 IP & Port",
+        "pf_software": "🧪 Server software",
+        "pf_ping": "📡 Ping tekshirish",
+        "pf_location": "🗺 Server joylashuvi",
+        "pf_daily": "📊 Kunlik statistika",
     },
     "ru": {
         "start": (
@@ -362,6 +380,24 @@ TEXTS = {
         "admin_removed": "✅ {uid} — Удалён из администраторов",
         "cancelled": "❌ Отменено",
         "new_member_group": "👋 Привет! Я <b>Minecraft Server Monitor</b>!\n\n🖥 Отправьте мне адрес сервера и я покажу статистику!\n\n💎 Подробнее: @{bot}",
+        "btn_admin_panel": "⚙️ Админ Панель",
+        "btn_top": "🏆 Топ серверов",
+        "btn_about": "ℹ️ О боте",
+        "btn_help": "❓ Справка",
+        "btn_lang": "🌐 Язык",
+        "btn_premium_get": "💎 Получить Premium",
+        "btn_premium_active": "💎 Premium ✅",
+        "btn_stats": "📊 Статистика",
+        "btn_add_group": "🤝 Добавить в группу",
+        "btn_subscribe": "💎 Купить подписку →",
+        "pf_players": "👥 Список игроков",
+        "pf_plugins": "🧩 Список плагинов",
+        "pf_hosting": "💻 Информация о хостинге",
+        "pf_ipport": "🔌 IP & Порт",
+        "pf_software": "🧪 Software сервера",
+        "pf_ping": "📡 Проверка пинга",
+        "pf_location": "🗺 Местоположение сервера",
+        "pf_daily": "📊 Ежедневная статистика",
     },
     "en": {
         "start": (
@@ -511,6 +547,24 @@ TEXTS = {
         "admin_removed": "✅ {uid} — Removed from admins",
         "cancelled": "❌ Cancelled",
         "new_member_group": "👋 Hello! I'm <b>Minecraft Server Monitor</b>!\n\n🖥 Send me a server address and I'll show statistics!\n\n💎 More: @{bot}",
+        "btn_admin_panel": "⚙️ Admin Panel",
+        "btn_top": "🏆 Top Servers",
+        "btn_about": "ℹ️ About Bot",
+        "btn_help": "❓ Help",
+        "btn_lang": "🌐 Language",
+        "btn_premium_get": "💎 Get Premium",
+        "btn_premium_active": "💎 Premium ✅",
+        "btn_stats": "📊 Statistics",
+        "btn_add_group": "🤝 Add to group",
+        "btn_subscribe": "💎 Buy subscription →",
+        "pf_players": "👥 Player list",
+        "pf_plugins": "🧩 Plugin list",
+        "pf_hosting": "💻 Hosting info",
+        "pf_ipport": "🔌 IP & Port",
+        "pf_software": "🧪 Server software",
+        "pf_ping": "📡 Ping check",
+        "pf_location": "🗺 Server location",
+        "pf_daily": "📊 Daily statistics",
     }
 }
 
@@ -653,30 +707,30 @@ class AdminState(StatesGroup):
 def main_keyboard(user_id):
     lang = get_user_lang(str(user_id))
     premium = is_premium(str(user_id))
-    premium_label = "💎 Premium ✅" if premium else "💎 Premium olish"
+    premium_label = t(lang, "btn_premium_active") if premium else t(lang, "btn_premium_get")
     kb = [
         [
-            InlineKeyboardButton(text="🏆 Top Serverlar", callback_data="top"),
-            InlineKeyboardButton(text="ℹ️ Bot haqida", callback_data="info"),
+            InlineKeyboardButton(text=t(lang, "btn_top"), callback_data="top"),
+            InlineKeyboardButton(text=t(lang, "btn_about"), callback_data="info"),
         ],
         [
-            InlineKeyboardButton(text="❓ Yordam", callback_data="help"),
-            InlineKeyboardButton(text="🌐 Til", callback_data="lang"),
+            InlineKeyboardButton(text=t(lang, "btn_help"), callback_data="help"),
+            InlineKeyboardButton(text=t(lang, "btn_lang"), callback_data="lang"),
         ],
         [InlineKeyboardButton(text=premium_label, callback_data="premium")],
-        [InlineKeyboardButton(text="📊 Statistika", callback_data="user_stats")],
-        [InlineKeyboardButton(text="🤝 Guruhga qo'shish", url=f"https://t.me/{BOT_USERNAME}?startgroup=on")],
+        [InlineKeyboardButton(text=t(lang, "btn_stats"), callback_data="user_stats")],
+        [InlineKeyboardButton(text=t(lang, "btn_add_group"), url=f"https://t.me/{BOT_USERNAME}?startgroup=on")],
     ]
     if is_admin(user_id):
-        kb.insert(0, [InlineKeyboardButton(text="⚙️ Admin Panel", callback_data="admin_panel")])
+        kb.insert(0, [InlineKeyboardButton(text=t(lang, "btn_admin_panel"), callback_data="admin_panel")])
     return InlineKeyboardMarkup(inline_keyboard=kb)
 
-def lang_keyboard():
+def lang_keyboard(lang="uz"):
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🇺🇿 O'zbek", callback_data="lang_uz")],
         [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru")],
         [InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en")],
-        [InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back_main")],
+        [InlineKeyboardButton(text=t(lang, "back"), callback_data="back_main")],
     ])
 
 def premium_features_keyboard(user_id):
@@ -684,18 +738,18 @@ def premium_features_keyboard(user_id):
     premium = is_premium(str(user_id))
     lock = "" if premium else " 🔒"
     buttons = [
-        [InlineKeyboardButton(text=f"👥 O'yinchilar ro'yxati{lock}", callback_data="pf_players")],
-        [InlineKeyboardButton(text=f"🧩 Pluginlar ro'yxati{lock}", callback_data="pf_plugins")],
-        [InlineKeyboardButton(text=f"💻 Hosting ma'lumoti{lock}", callback_data="pf_hosting")],
-        [InlineKeyboardButton(text=f"🔌 IP & Port{lock}", callback_data="pf_ipport")],
-        [InlineKeyboardButton(text=f"🧪 Server software{lock}", callback_data="pf_software")],
-        [InlineKeyboardButton(text=f"📡 Ping tekshirish{lock}", callback_data="pf_ping")],
-        [InlineKeyboardButton(text=f"🗺 Server joylashuvi{lock}", callback_data="pf_location")],
-        [InlineKeyboardButton(text=f"📊 Kunlik statistika{lock}", callback_data="pf_daily")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_players')}{lock}", callback_data="pf_players")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_plugins')}{lock}", callback_data="pf_plugins")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_hosting')}{lock}", callback_data="pf_hosting")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_ipport')}{lock}", callback_data="pf_ipport")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_software')}{lock}", callback_data="pf_software")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_ping')}{lock}", callback_data="pf_ping")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_location')}{lock}", callback_data="pf_location")],
+        [InlineKeyboardButton(text=f"{t(lang, 'pf_daily')}{lock}", callback_data="pf_daily")],
     ]
     if not premium:
-        buttons.append([InlineKeyboardButton(text="💎 Obuna sotib olish →", url=PREMIUM_CONTACT)])
-    buttons.append([InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back_main")])
+        buttons.append([InlineKeyboardButton(text=t(lang, "btn_subscribe"), url=PREMIUM_CONTACT)])
+    buttons.append([InlineKeyboardButton(text=t(lang, "back"), callback_data="back_main")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 def admin_keyboard():
@@ -1019,7 +1073,7 @@ async def cmd_stats(message: types.Message):
 async def cmd_lang(message: types.Message):
     uid = str(message.from_user.id)
     lang = get_user_lang(uid)
-    await message.answer(t(lang, "lang_choose"), reply_markup=lang_keyboard(), parse_mode="HTML")
+    await message.answer(t(lang, "lang_choose"), reply_markup=lang_keyboard(lang), parse_mode="HTML")
 
 @dp.message(Command("premium"))
 async def cmd_premium(message: types.Message):
@@ -1143,7 +1197,7 @@ async def cb_user_stats(call: types.CallbackQuery):
 async def cb_lang(call: types.CallbackQuery):
     lang = get_user_lang(str(call.from_user.id))
     try:
-        await call.message.edit_text(t(lang, "lang_choose"), reply_markup=lang_keyboard(), parse_mode="HTML")
+        await call.message.edit_text(t(lang, "lang_choose"), reply_markup=lang_keyboard(lang), parse_mode="HTML")
     except TelegramBadRequest:
         pass
     await call.answer()
@@ -1872,8 +1926,14 @@ async def handle_text(message: types.Message, state: FSMContext):
         register_user(uid, name, username=username)
         await send_server_status(message, text)
     else:
-        lang = get_user_lang(uid)
-        await message.reply(t(lang, "server_invalid"), parse_mode="HTML")
+        # Oddiy gaplarga (salom, matn va h.k.) umuman javob bermaymiz.
+        # Faqat "domen/IP yozishga urinib, xato qilgan" holatlarda yordam ko'rsatamiz
+        # (masalan nuqta bor, lekin format noto'g'ri: "play. hypixel .net")
+        looks_like_attempt = "." in text and " " not in text and len(text) >= 4
+        if looks_like_attempt:
+            lang = get_user_lang(uid)
+            await message.reply(t(lang, "server_invalid"), parse_mode="HTML")
+        # aks holda - hech narsa demaymiz, xuddi guruhdagidek
 
 # ================= RENDER UCHUN MINIMAL WEB SERVER =================
 # Render "Web Service" turi portni tinglab turishni talab qiladi.
