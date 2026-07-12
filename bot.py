@@ -855,21 +855,20 @@ def build_more_text(ip: str, data: dict, uid: str, lang: str) -> str:
         motd = " | ".join(motd_data.get("clean", [])) or t(lang, "no_data")
     else:
         motd = str(motd_data) or t(lang, "no_data")
-    
+
     players = data.get("players", {})
     players_list = players.get("list", [])
     if isinstance(players_list, list) and len(players_list) > 0:
-        # Handle both string list and dict list
         if isinstance(players_list[0], dict):
             players_names = [p.get("name", "?") for p in players_list[:20]]
         else:
             players_names = players_list[:20]
     else:
         players_names = []
-    
+
     online_count = players.get("online", 0)
     max_players = players.get("max", "?")
-    
+
     version_info = data.get("version", t(lang, "no_data"))
     if isinstance(version_info, dict):
         version = version_info.get("name", t(lang, "no_data"))
@@ -877,12 +876,16 @@ def build_more_text(ip: str, data: dict, uid: str, lang: str) -> str:
     else:
         version = version_info or t(lang, "no_data")
         protocol = ""
-    
+
     ping = data.get("debug", {}).get("ping", False)
-    ping_str = "✅" if ping else "❌"
+    ping_str = "✅ Javob beryapti" if ping else "❌ Javob yo'q"
     online = data.get("online", False)
     premium = is_premium(uid)
     tarif_str = t(lang, "tarif_premium") if premium else t(lang, "tarif_free")
+
+    hostname = data.get("hostname", ip)
+    port = data.get("port", "25565")
+    eula_blocked = data.get("eula_blocked", False)
 
     if players_names:
         players_str = ", ".join(players_names)
@@ -892,36 +895,58 @@ def build_more_text(ip: str, data: dict, uid: str, lang: str) -> str:
         players_str = t(lang, "no_players")
 
     bar = progress_bar(online_count, max_players if max_players else 0)
+    status_line = "🟢 <b>Online</b>" if online else "🔴 <b>Offline</b>"
 
+    # ── Umumiy ma'lumot ──
     text = (
         f"📌 <b>{ip}</b> — batafsil\n"
-        f"┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n"
+        f"{status_line}\n"
+        f"┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n\n"
         f"💬 <i>{motd}</i>\n\n"
-        f"👥 <b>{online_count}/{max_players}</b>\n"
-        f"<code>{bar}</code>\n"
-        f"   ↳ {players_str}\n\n"
-        f"⚙️ {version}"
+        f"🌐 <b>Manzil:</b> <code>{hostname}:{port}</code>\n"
     )
+
+    # ── O'yinchilar ──
+    text += (
+        f"\n👥 <b>O'yinchilar:</b> {online_count}/{max_players}\n"
+        f"<code>{bar}</code>\n"
+        f"   ↳ {players_str}\n"
+    )
+
+    # ── Texnik ma'lumot ──
+    text += f"\n⚙️ <b>Versiya:</b> {version}"
     if protocol:
         text += f" <i>(protocol {protocol})</i>"
+    text += f"\n📡 <b>Ping:</b> {ping_str}"
+
+    if eula_blocked:
+        text += f"\n⚠️ <b>Diqqat:</b> server Mojang EULA bo'yicha bloklangan"
+
     text += (
-        f"\n📡 Ping: {ping_str}  ·  {'🟢 Online' if online else '🔴 Offline'}\n"
-        f"┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n"
+        f"\n┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n"
         f"{tarif_str}  ·  🕐 {format_time()}"
     )
 
+    # ── Premium bo'limi ──
     if premium:
         plugins = ", ".join(data.get("plugins", {}).get("names", [])[:15]) or t(lang, "no_data")
         software = data.get("software", t(lang, "no_data"))
         hosting = data.get("ip", t(lang, "no_data"))
         icon = data.get("icon", "")
+        map_name = data.get("map", {})
+        if isinstance(map_name, dict):
+            map_name = map_name.get("clean") or map_name.get("raw") or t(lang, "no_data")
+        map_name = map_name or t(lang, "no_data")
+
         text += (
             f"\n\n💎 <b>Premium ma'lumotlar</b>\n"
-            f"🧩 Pluginlar: {plugins}\n"
-            f"🧪 Software: {software}   •   💻 Hosting IP: {hosting}"
+            f"🧩 <b>Pluginlar:</b> {plugins}\n"
+            f"🧪 <b>Software:</b> {software}\n"
+            f"💻 <b>Hosting IP:</b> {hosting}\n"
+            f"🗺 <b>Xarita:</b> {map_name}"
         )
         if icon:
-            text += "\n🖼 Icon: mavjud ✅"
+            text += "\n🖼 <b>Icon:</b> mavjud ✅"
 
     return text
 
