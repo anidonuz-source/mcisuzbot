@@ -1871,6 +1871,8 @@ async def start_keepalive_server():
 # ================= RUN =================
 async def main():
     print("✅ Minecraft Stats Bot v2.0 ishga tushdi!")
+    # Avval o'rnatilgan webhook bo'lsa (polling bilan to'qnashadi), uni tozalaymiz
+    await bot.delete_webhook(drop_pending_updates=True)
     await start_keepalive_server()
     await dp.start_polling(bot, drop_pending_updates=True)
 
